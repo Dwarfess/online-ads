@@ -1,12 +1,17 @@
-
-<div class="panel-body panel edit">
-    <form name = "createGroups" novalidate>
-        <div class="form-group">
-            <label>Name:</label>
-            <input class="form-control" ng-model="currentItem.title" required/>
+<div class="panel-body">
+    <div class = "info panel">
+        <input class = "back" type="button" value = "⤾" ng-click = "back()">    
+        <div class = "itemInfo">
+            <h4>{{userInfo.name}}</h4>
+            <div class = "itemInfo__top">
+                <h5>Phone: <span>{{userInfo.phone}}</span></h5>
+                <h5>Email: <span>{{userInfo.email}}</span></h5>
+                <h5>Advertisement:</h5>
+                <ul class="list-group">
+                    <li ng-repeat="item in userAds" class="list-group-item" ng-click = "show(item)">{{item.title}}, <span>${{item.price}}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <button class="btn btn-default" ng-disabled="createGroups.$invalid" ng-click = "createGroup(currentItem)">Save</button> 
-        <button class="btn btn-default" ng-click="cancelEdit(null, 'edit')">Cancel</button>
-    </form>
+    </div>
 </div>

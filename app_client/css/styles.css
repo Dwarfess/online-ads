@@ -101,6 +101,10 @@ hr {
   color: white;
   text-shadow: 0 0 0.1px #212121;
 }
+.header .logIn span span:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
 .wrapper {
   max-width: 1280px;
   padding: 15px;
@@ -239,6 +243,21 @@ hr {
   border-radius: 5px;
   margin-bottom: 40px;
 }
+.info .itemInfo__top li {
+  background: #3399cc;
+  color: white;
+  font-size: 130%;
+}
+.info .itemInfo__top li:hover {
+  background: #5cadd6;
+  cursor: pointer;
+}
+.info .itemInfo__top li:active {
+  background: #3399cc;
+}
+.info .itemInfo__top li span {
+  color: #465157;
+}
 .info .itemInfo .userInfo {
   margin: 15px;
   padding: 0 15px;
@@ -352,8 +371,8 @@ hr {
   color: white;
   text-shadow: 0 0 0.5px #465157;
   position: absolute;
-  top: 80px;
-  right: 5px;
+  top: 95px;
+  right: 10px;
   z-index: 999;
   background: rgba(0, 0, 0, 0.4);
 }
@@ -367,8 +386,8 @@ hr {
 .regForm {
   color: white;
   position: absolute;
-  top: 80px;
-  right: 5px;
+  top: 95px;
+  right: 10px;
   z-index: 999;
   background: rgba(0, 0, 0, 0.4);
 }

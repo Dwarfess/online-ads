@@ -1,116 +1,4 @@
-var app = angular.module("app", []);
-
-app.controller("mainCtrl", function ($scope, $http){
-
-    //present view
-    $scope.currentView = "table";
-    
-    
-                        //FOR LOGIN AND REGISTRATION
-    $scope.bg = false;//fixed background 
-    $scope.log = false;//form for login
-    $scope.reg = false;//form for registration
-    
-    $scope.existingLogin = false;
-    $scope.wrongLogin = false;
-    $scope.wrongPass = false;
-    
-    $scope.showForms = function(x,y,z,h){  //fuction for bg, log and reg
-        $scope.bg = x;
-        $scope.log = y;
-        $scope.reg = z;
-        
-        //cleans form messages
-        $scope.existingLogin = h;
-        $scope.wrongLogin = h;
-        $scope.wrongPass = h;
-        
-        //cleans forms
-        $scope.user={};
-        $scope.newUser={}; 
-        $scope.newUser.email = "";
-        $scope.newUser2={};
-    }
-    
-    
-    //add new users
-    $scope.addNewUser = function (newUser) {        
-        $http.post('api/users', newUser).then(function (response) {
-            console.log('success', response.data);// success
-            
-            if(response.data == "Error"){
-                $scope.existingLogin = true;//error - this login exists
-            }else{
-                $scope.showForms(false,false,false,false);
-            }
-            
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });       
-    }
-    
-    $scope.online = {"logged":true};//info about logged user
-    
-    $scope.logIn = function(){//for login into the site
-
-        $http.post("api/auth", {login: $scope.user.login, password: $scope.user.pass}).then(function (response) {
-            console.log('success', response.data);// success
-            if (response.data.login) {
-                $scope.online.logged = false;//check logged in or not
-                $scope.online.login = response.data.login;//add user name
-                
-                $scope.showForms(false,false,false,false);
-                
-            } if (response.data.status == 1) {
-                $scope.wrongLogin = false;
-                $scope.wrongPass = true;
-                
-            } if (response.data.status == 2) {   
-                $scope.wrongLogin = true;
-                $scope.wrongPass = false;
-            }
-            
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });
-    }
-    
-    $scope.logOut = function(x){//for log out from the site
-        $scope.online.logged = true;
-        
-        $scope.$broadcast('currentView', {
-            message: "table"
-        });
-    }
-    
-    
-                        //FOR ERRORS WHEN FILLING THE FORMS
-    $scope.getError = function (error, type) {
-        if (angular.isDefined(error)) {
-            if (error.email) {
-                return "Wrong email";
-            } else if (error.pattern && type){
-                return "Wrong password";
-            }
-        }
-    }
-});
-
-
-
-
-
-
-
-
-
-app.controller("viewCtrl", function ($scope, $http){
+app.controller("viewCtrl", function ($scope, $http, $location){
     $scope.json = [{title:"Drill",
                     price:"5.00",
                     image:"",
@@ -152,24 +40,26 @@ app.controller("viewCtrl", function ($scope, $http){
 //            $scope.currentView = "info";
         if($scope.online.logged){
             $scope.info = item;
-            $scope.currentView = "info";
+            $location.path('/info');
         }else{
             $scope.$parent.bg = true; 
             $scope.$parent.log = true;
         }
     }
-    
+    $scope.userInfo = {};
+    $scope.userAds = $scope.json;
     //select pressed task 
     $scope.getUser = function(user){
-        console.log(user);
+        
 //        if(!$scope.online.logged){
 //            $scope.info = item;
 //            $scope.currentView = "info";
         if($scope.online.logged){
             $scope.userInfo = user;
+            console.log($scope.userInfo);
             $scope.userAds = $scope.json;
             console.log($scope.userAds);
-            $scope.currentView = "userInfo";
+            $location.path('/userInfo');
             
 //            $http.get('/api/user/<id>').then(function (response) {
 //                console.log('success', response.data);// success
@@ -194,7 +84,7 @@ app.controller("viewCtrl", function ($scope, $http){
     
     //return to present view
     $scope.back = function(){
-        $scope.currentView = "table";
+        $location.path('/');
     }
     
     //edit or create new task
@@ -202,7 +92,8 @@ app.controller("viewCtrl", function ($scope, $http){
     $scope.editOrCreate = function (item, view, currentView, showGroup) {
         $scope.showGroup = showGroup;
         $scope.currentItem = item ? angular.copy(item) : {};
-        $scope.currentView = currentView;
+        $location.path(`/${currentView}`);
+        //$scope.currentView = currentView;
         $scope.view = view;
     }
 
@@ -225,21 +116,6 @@ app.controller("viewCtrl", function ($scope, $http){
         }
     }    
     
-    //CREATE NEW GROUP
-    $scope.createGroup = function (item) {
-        $http.post('api/group', item).then(function (response) {
-            console.log('success', response.data);// success
-            $scope.json = response.data;
-            $scope.currentView = "table";
-            
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });
-    }
-    
     //ADD NEW TASK
     $scope.createTask = function (item) {
         $http.post('api/task', item).then(function (response) {
@@ -253,23 +129,6 @@ app.controller("viewCtrl", function ($scope, $http){
             console.log(headers);
             console.log(config);
         });
-    }
-    
-
-    //DELETE THE GROUP
-    $scope.deleteGroup = function (index) {
-        $http.delete('api/deleteGroup?id='+$scope.json[index]._id).then(function (response) {
-            console.log('success', response.data);// success
-            $scope.json = response.data;
-              
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });
-
-        $scope.currentView = "table"; 
     }
 
     //DELETE THE TASK FROM THE GROUP
@@ -314,10 +173,6 @@ app.controller("viewCtrl", function ($scope, $http){
     //cancel changes and return to present table
     $scope.cancelEdit = function (item) {
         $scope.currentItem = {};
-        $scope.currentView = $scope.view;
+        $location.path(`/${$scope.view}`);
     }
 });
-
-
-
-

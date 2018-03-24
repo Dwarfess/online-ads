@@ -6,8 +6,11 @@
     <link href="libraries/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     
-    <script src="libraries/angular.js"></script>	
-	<script src="js/app.js"></script>
+    <script src="libraries/angular.js"></script>
+    <script src="libraries/angular-route.min.js"></script>	
+	<script src="app.js"></script>
+	<script src="controllers/mainCtrl.js"></script>
+	<script src="controllers/viewCtrl.js"></script>
 </head>
 
 <body ng-controller="mainCtrl">
@@ -38,19 +41,23 @@
                 <button ng-show = "online.logged" class="btn btn-default" ng-click = "showForms(true, true, false)">Log in</button>
                 
                 <div ng-hide = "online.logged">
-                   <span>Hello, {{online.login}}</span>
+                   <span>Hello, 
+                       <span ng-click = "showForms(true, false, true)">{{online.login}}</span>
+                   </span>
                    <button class="btn btn-default" ng-click = "logOut()">Log out</button> 
                 </div>
             </div>
         </div>    
     </div>
     <hr>
-    <div class="container" ng-controller="viewCtrl">        <!--views-->
-        
-        <ng-include src="'views/table.html'" ng-show="currentView == 'table'"></ng-include>
-        <ng-include src="'views/info.html'" ng-show="currentView == 'info'"></ng-include>
-        <ng-include src="'views/edit.html'" ng-show="currentView == 'edit'"></ng-include>
-        <ng-include src="'views/create.html'" ng-show="currentView == 'create'"></ng-include>
+    <div class="container" ng-controller="viewCtrl"> 
+    <ng-view></ng-view>
+<!--
+        <ng-view src="'views/table.html'" ng-show="currentView == 'table'"></ng-view>
+        <ng-view src="'views/info.html'" ng-show="currentView == 'info'"></ng-view>
+        <ng-view src="'views/edit.html'" ng-show="currentView == 'edit'"></ng-view>
+        <ng-view src="'views/userInfo.html'" ng-show="currentView == 'userInfo'"></ng-view>
+-->
     </div>
         
                                     <!--forms-->
@@ -60,7 +67,7 @@
     <form class = "logForm panel" name="logForm" novalidate ng-show = "log">
         <div class="well">
             <div class="form-group">
-                <label>Login:</label>
+                <label>Email:</label>
                 <input name="userLogin" type="text" class="form-control" ng-model="user.login" placeholder="Your login" ng-focus="wrongLogin=false" required>
                     
                 <!--for error-->
@@ -81,7 +88,7 @@
                 
             <button type="button" class="btn btn-primary btn-block" ng-disabled="logForm.$invalid" ng-show = "log" ng-click = "logIn()">Ok</button>
             
-            <button type="button" class="btn btn-success btn-block" ng-click = "showForms(true, false, true)">Registration</button>
+            <a class="btn btn-primary btn-block" ng-click = "showForms(false, false, false, false)">Cancel</a>
         </div>
     </form>
     
@@ -89,12 +96,12 @@
     <form class = "regForm panel" name="regForm" novalidate ng-submit="addNewUser(newUser)" ng-show = "reg">
         <div class="well">
             <div class="form-group">
-                <label>Login:</label>
-                <input name="userLogin" type="text" class="form-control" ng-model="newUser.login" placeholder="Your login" ng-focus="existingLogin=false" required>
+                <label>Name:</label>
+                <input name="userName" type="text" class="form-control" ng-model="newUser.name" placeholder="Your name" ng-focus="existingName=false" required>
                     
                 <!--for error-->
-                <div class="error" ng-show="existingLogin">
-                    the login exist
+                <div class="error" ng-show="existingName">
+                    the name exist
                 </div>
             </div>
             <div class="form-group">
@@ -108,32 +115,21 @@
             </div>
     
             <div class="form-group">
-                <label>Password:</label>
-                <input name="userPass1" type="password" class="form-control"  ng-model="newUser.pass" required>
+                <label>Phone:</label>
+                <input name="userPass1" type="text" class="form-control"  ng-model="newUser.pass"  placeholder="+99 (999) 999 99 99"  required>
                     
                 <!--for error-->
                 <div class="error" ng-show="regForm.userPass1.$invalid && regForm.userPass1.$dirty">
                     {{getError(regForm.userPass1.$error)}}
                 </div>
             </div>
-            <div class="form-group">
-                <label>Repeat password:</label>
-                <input name="userPass2" type="password" class="form-control"  ng-model="newUser2.pass" ng-pattern="newUser.pass" required>
-                    
-                <!--for error-->
-                <div class="error" ng-show="regForm.userPass2.$invalid && regForm.userPass2.$dirty">
-                    {{getError(regForm.userPass2.$error, true)}}
-                </div>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input name="agreed" type="checkbox" ng-model="newUser2.agreed" required>I agree to the terms
-                </label>
-            </div>
                 
-            <a class="btn btn-primary btn-block" ng-disabled= "regForm.$invalid" ng-click = "addNewUser(newUser)">Sign up</a>
+            <a class="btn btn-primary btn-block" ng-disabled= "regForm.$invalid" ng-click = "addNewUser(newUser)">Change </a>
+            
+            <a class="btn btn-primary btn-block" ng-click = "showForms(false, false, false, false)">Cancel</a>
         </div>
     </form>
+    
     
 </body>
 </html>

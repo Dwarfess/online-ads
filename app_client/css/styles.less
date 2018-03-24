@@ -101,6 +101,13 @@ hr{
         span{
             color:white;
             text-shadow: 0 0 0.1px #212121;
+            
+            span{
+                &:hover{
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+            }
         }
     }
 }
@@ -250,6 +257,19 @@ hr{
                     margin-bottom:40px;
                 }
             }
+            
+            li{
+                background: @secondColor;
+                color:white;
+                font-size:130%;
+                
+                &:hover{background: lighten(@secondColor, 10%); cursor: pointer}
+                &:active{background: @secondColor}
+                
+                span{
+                    color:@firstColor;
+                }
+            }
         }
         
         .userInfo{
@@ -378,8 +398,8 @@ hr{
     color:white; 
     text-shadow: 0 0 0.5px @firstColor;
     position:absolute;
-    top:80px;
-    right:5px;
+    top:95px;
+    right:10px;
     z-index: 999;
     background: rgba(0, 0, 0, .4);
     
@@ -396,8 +416,8 @@ hr{
 .regForm{
     color:white;
     position:absolute;
-    top:80px;
-    right:5px;
+    top:95px;
+    right:10px;
     z-index: 999;
     background: rgba(0, 0, 0, .4);
     
