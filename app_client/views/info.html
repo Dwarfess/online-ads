@@ -1,0 +1,31 @@
+
+<div class="panel-body">
+    <div class = "info panel">
+        <input class = "back" type="button" value = "⤾" ng-click = "back()">
+        <div class = "img">
+            <img ng-src="{{info.image || 'img/default.png'}}">         
+        </div>     
+              
+        <div class = "itemInfo">
+            <h4>{{info.title}}</h4>
+            <div class = "itemInfo__top">
+                <h5>Price: <span>${{info.price}}</span></h5>
+                <h5>Date: {{info.created_at| date:"dd.MM.yyyy"}}</h5>
+                
+                <input type = "button" class="btn btn-sm btn-primary" ng-click="editOrCreate(info, 'info', 'edit', false)" value = "Edit">
+
+                <input type = "button" class="btn btn-sm btn-primary" ng-click="deleteTask(info)" value = "Delete">
+            </div>
+            
+            <div class="userInfo" ng-click="getUser(info.user)">
+                <h4>{{info.user.name}}</h4>
+                <h5>{{info.user.phone}}</h5>
+                <h5>{{info.user.email}}</h5>
+            </div>
+        </div>
+        
+        
+    </div>
+</div>
+
+
