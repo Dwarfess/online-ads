@@ -18,8 +18,8 @@ app.controller("mainCtrl", function ($scope, $http, $window){
         $scope.reg = z;
         
         //cleans form messages
-        $scope.existingLogin = h;
-        $scope.wrongLogin = h;
+        $scope.createdUser = h;
+        $scope.wrongEmail = h;
         $scope.wrongPass = h;
         
         //cleans forms
@@ -52,21 +52,20 @@ app.controller("mainCtrl", function ($scope, $http, $window){
     $scope.online = {"logged":true};//info about logged user
     
     $scope.logIn = function(){//for login into the site
-
-        $http.post("api/auth", {login: $scope.user.login, password: $scope.user.pass}).then(function (response) {
+        $http.post("api/login", {email: $scope.user.email, password: $scope.user.pass}).then(function (response) {
             console.log('success', response.data);// success
-            if (response.data.login) {
+            if (response.data.email) {
                 $scope.online.logged = false;//check logged in or not
-                $scope.online.login = response.data.login;//add user name
+                $scope.online.login = response.data.name;//add user name
                 
                 $scope.showForms(false,false,false,false);
                 
             } if (response.data.status == 1) {
-                $scope.wrongLogin = false;
+                $scope.createdUser = false;
                 $scope.wrongPass = true;
                 
             } if (response.data.status == 2) {   
-                $scope.wrongLogin = true;
+                $scope.createdUser = true;
                 $scope.wrongPass = false;
             }
             

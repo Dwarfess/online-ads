@@ -11,6 +11,7 @@
 	<script src="app.js"></script>
 	<script src="controllers/mainCtrl.js"></script>
 	<script src="controllers/viewCtrl.js"></script>
+	<script src="services/transport.js"></script>
 </head>
 
 <body ng-controller="mainCtrl">
@@ -66,13 +67,18 @@
     <!--logForm-->               
     <form class = "logForm panel" name="logForm" novalidate ng-show = "log">
         <div class="well">
+                       
             <div class="form-group">
                 <label>Email:</label>
-                <input name="userLogin" type="text" class="form-control" ng-model="user.login" placeholder="Your login" ng-focus="wrongLogin=false" required>
-                    
+                <input name="userEmail" type="email" class="form-control"  ng-model="user.email" placeholder="name@address.com" ng-focus="createdUser=false; " required>
+                
                 <!--for error-->
-                <div class="error" ng-show="wrongLogin">
-                    wrong login
+                <div class="error" ng-show="wrongEmail">
+                    incorrect email
+                </div>
+                <!--for error-->
+                <div class="currect" ng-show="createdUser">
+                    user was created
                 </div>
             </div>
 

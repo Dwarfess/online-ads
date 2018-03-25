@@ -1,4 +1,4 @@
-app.controller("viewCtrl", function ($scope, $http, $location){
+app.controller("viewCtrl", function ($scope, $rootScope, $http, $location, transport){
     $scope.json = [{title:"Drill",
                     price:"5.00",
                     image:"",
@@ -46,19 +46,20 @@ app.controller("viewCtrl", function ($scope, $http, $location){
             $scope.$parent.log = true;
         }
     }
-    $scope.userInfo = {};
-    $scope.userAds = $scope.json;
-    //select pressed task 
+
+    //select pressed user with ads 
     $scope.getUser = function(user){
         
 //        if(!$scope.online.logged){
 //            $scope.info = item;
 //            $scope.currentView = "info";
         if($scope.online.logged){
-            $scope.userInfo = user;
-            console.log($scope.userInfo);
-            $scope.userAds = $scope.json;
-            console.log($scope.userAds);
+            $rootScope.userInfo = user;
+            $rootScope.userAds = $scope.json;
+            console.log(`User${Math.floor(Math.random()*100000)}`);
+//            transport.setCurrent(user);
+//            transport.setCurrent($scope.json);
+//            $scope.userInfo = transport.getCurrent();
             $location.path('/userInfo');
             
 //            $http.get('/api/user/<id>').then(function (response) {
@@ -88,13 +89,10 @@ app.controller("viewCtrl", function ($scope, $http, $location){
     }
     
     //edit or create new task
-    $scope.showGroup = true;//show or hide select with groups
     $scope.editOrCreate = function (item, view, currentView, showGroup) {
-        $scope.showGroup = showGroup;
-        $scope.currentItem = item ? angular.copy(item) : {};
+        $rootScope.currentItem = item ? angular.copy(item) : {};
         $location.path(`/${currentView}`);
-        //$scope.currentView = currentView;
-        $scope.view = view;
+        $rootScope.view = view;
     }
 
     //save changes
@@ -173,6 +171,6 @@ app.controller("viewCtrl", function ($scope, $http, $location){
     //cancel changes and return to present table
     $scope.cancelEdit = function (item) {
         $scope.currentItem = {};
-        $location.path(`/${$scope.view}`);
+        $location.path(`/${$rootScope.view}`);
     }
 });

@@ -396,9 +396,14 @@ hr {
   background: none !important;
 }
 span.summary.ng-invalid,
-div.error {
+.error {
   text-align: center;
-  color: red;
+  color: #FE5E6D;
+  font-weight: bold;
+}
+.currect {
+  text-align: center;
+  color: #68B631;
   font-weight: bold;
 }
 .col-lg-1 {
