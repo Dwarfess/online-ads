@@ -1,4 +1,4 @@
-app.controller("mainCtrl", function ($scope, $http, $window){
+app.controller("mainCtrl", function ($scope, $http, transport){
 
     //present view
     
@@ -35,6 +35,7 @@ app.controller("mainCtrl", function ($scope, $http, $window){
             console.log('success', response.data);// success
             if (response.data.token) {
                 $scope.token = response.data.token;
+                transport.setToken($scope.token);//send token with service
                 $scope.online.logged = false;//check logged in or not
                 $scope.online.login = response.data.name;//add user name
                 
@@ -102,10 +103,7 @@ app.controller("mainCtrl", function ($scope, $http, $window){
     $scope.logOut = function(x){//for log out from the site
         $scope.online.logged = true;
         $scope.token = '';
-        
-        $scope.$broadcast('currentView', {
-            message: "table"
-        });
+        transport.setToken($scope.token);//send token with service
     }
     
     

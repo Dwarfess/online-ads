@@ -25,11 +25,9 @@
             <form class = "search" ng-controller = "itemCtrl">
                 <input type="text" ng-model = "search.title" placeholder="search">
                 <select name="" ng-model = "search.order_by" ng-options="order_by for order_by in ['created_at','price']">         
-                    <option value="" selected>-- choose --</option>
                 </select> 
 
                 <select name="" ng-model = "search.order_type" ng-options="order_type for order_type in ['desc','esc']">         
-                    <option value="" selected>-- choose --</option>
                 </select>
                 <button ng-click = "searchItems(search)">
                     <i class="fa fa-search" aria-hidden="true"></i>

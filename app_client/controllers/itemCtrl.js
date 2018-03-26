@@ -1,4 +1,5 @@
 app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, transport){
+
     $scope.json = [{title:"Drill",
                     price:"5.00",
                     image:"",
@@ -30,24 +31,24 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
                    }
                   }];
     
-    $scope.order = [1,2];
     //SEARCH ITEMS
-    $scope.search = {};
+    $scope.search = {title:"", order_by:"created_at", order_type:"desc"};
     $scope.searchItems = function(search){
 
         console.log(search);
         
-//        $http.get('/api/item?title=book&user_id=1&order_by=created_at&order_type=desc').then(function (response) {
-//            console.log('success', response.data);// success
-//            $scope.json = response.data;
-//            $scope.currentView = "table";
-//
-//        }, function (data, status, headers, config) {
-//            console.log(data);
-//            console.log(status);
-//            console.log(headers);
-//            console.log(config);
-//        });
+        $http.get(`/api/item?title=${search.title}&user_id=1&order_by=${search.order_by}&order_type=${search.order_type}`).then(function (response) {
+            console.log('success', response.data);// success
+            $scope.json = response.data;
+            console.log($scope.json);
+            $location.path('/table');
+
+        }, function (data, status, headers, config) {
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
     }
     
                     //OPTION FOR REGISTERED USERS
@@ -60,19 +61,14 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
 
     //select pressed user with ads 
     $scope.getUserInfo = function(user){
-        
-//        if(!$scope.online.logged){
-//            $scope.info = item;
-//            $scope.currentView = "info";
-        if($scope.online.logged){
-            $rootScope.userInfo = user;
-            $rootScope.userAds = $scope.json;
-            console.log(`User${Math.floor(Math.random()*100000)}`);
-//            transport.setCurrent(user);
-//            transport.setCurrent($scope.json);
-//            $scope.userInfo = transport.getCurrent();
-            $location.path('/userInfo');
-            
+
+        $rootScope.userInfo = user;
+        $rootScope.userAds = $scope.json;
+    //            transport.setCurrent(user);
+    //            transport.setCurrent($scope.json);
+    //            $scope.userInfo = transport.getCurrent();
+        $location.path('/userInfo');
+//
 //            $http.get('/api/user/<id>').then(function (response) {
 //                console.log('success', response.data);// success
 //                $scope.json = response.data;
@@ -84,15 +80,7 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
 //                console.log(headers);
 //                console.log(config);
 //            });
-        }else{
-            $scope.$parent.bg = true; 
-            $scope.$parent.log = true;
-        }
     }
-    
-    $scope.$on('currentView', function (event, data) {//if logout, currentView - table
-        $scope.currentView = data.message; 
-    });
     
     //return to present view
     $scope.back = function(){
@@ -101,36 +89,36 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
     
     //edit or create new task
     $scope.editOrCreate = function (item, view, currentView, showGroup) {
-        $rootScope.currentItem = item ? angular.copy(item) : {};
-        $location.path(`/${currentView}`);
-        $rootScope.view = view;
+        $scope.token = transport.getToken();
+        console.log($scope.token);
+        if($scope.token){
+            $rootScope.currentItem = item ? angular.copy(item) : {};
+            $location.path(`/${currentView}`);
+            $rootScope.view = view;
+        } else $scope.showForms(true, true, false);
     }
 
     //save changes
     $scope.saveEdit = function (item) {
-        try{//check the valid date
-            if(new Date(item.due_date).toISOString().substr(0, 10)==item.due_date.substr(0, 10)){
-                if (angular.isDefined(item._id)) {
-                    console.log("=========== update");
-                    $scope.updateTask(item);
-                } else {
-                    console.log("=========== create");
-                    $scope.createTask(item);
-                }
-            } else {
-                $scope.wrongDate = true;
-            }       
-        } catch (e){
-            $scope.wrongDate = true;
+        if (angular.isDefined(item._id)) {
+            console.log("=========== update");
+            $scope.updateTask(item);
+        } else {
+            console.log("=========== create");
+            $scope.createItem(item);
         }
     }    
     
     //ADD NEW TASK
-    $scope.createTask = function (item) {
-        $http.post('api/task', item).then(function (response) {
-            console.log('success', response.data);// success
-            $scope.json = response.data;
-            $scope.currentView = "table";
+    $scope.createItem = function (item) {
+        
+        $http.defaults.headers.common['Authorization'] = $scope.token;
+        $http.post('api/items', item).then(function (response) {
+            if(response.data.title){
+                console.log(response.data);
+                $rootScope.info = response.data;
+                $location.path('/info');
+            } else console.log('success', response.data);// success
             
         }, function (data, status, headers, config) {
             console.log(data);

@@ -1,26 +1,9 @@
-//(function() {
-//    
-//    angular
-//        .module('app')
-//        .factory('transport', bpCur);
-//
-//    function bpCur() {
-//        var _current;
-//        return {
-//            setCurrent: function(dt) {
-//                _current = dt;
-//            },
-//            getCurrent: function() {
-//                return _current;
-//            }
-//        }
-//    }
-//})();
 
 app.service('transport', function () {//сервис для получения/передачи объекта
-   var _current = null;
+    var _current = null;
     var _items = null;
-   return {
+    var _token = null;
+    return {
        setCurrent: function (n) {
          _current = n;
        },
@@ -32,6 +15,12 @@ app.service('transport', function () {//сервис для получения/�
        },
       getItems: function () {
          return _items;
+      },
+        setToken: function (n) {
+         _token = n;
+       },
+      getToken: function () {
+         return _token;
       }
     }
 });

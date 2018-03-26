@@ -50,7 +50,7 @@ module.exports.getUser = function(req, res){
                 res.jsonp(doc);
             }); 
         } else  {
-            var resp = {"status":401, "field":"Unauthorized","message":"You should again"};
+            var resp = {"status":401, "field":"Unauthorized","message":"You should log in again"};
             res.jsonp(resp);
         }
     });
@@ -73,7 +73,7 @@ module.exports.editUser = function(req, res){
                     res.jsonp(doc);
                 }); 
         } else  {
-            var resp = {"status":401, "field":"Unauthorized","message":"You should again"};
+            var resp = {"status":401, "field":"Unauthorized","message":"You should log in again"};
             res.jsonp(resp);
         }
     });

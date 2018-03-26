@@ -4,12 +4,18 @@ mongoose.Promise = global.Promise;
 
 //setting the schema
 var itemScheme = new Schema({
+    created_at: { type: Date, default: Date.now },
     title: String,
-    tasks: [{
+    price: Number,
+    image: String,
+    user_id: String,
+    user: {
+        _id: String,
         name: String,
-        due_date: { type: Date, default: Date.now },
-        description: String
-    }]
+        email: String,
+        phone: String,
+        password: String
+    }
 });
     
 mongoose.model("item", itemScheme);//create module with schema

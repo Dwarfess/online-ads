@@ -3,6 +3,8 @@ var url = require('url');
 var qs = require("querystring");
 
 var mongoose = require('mongoose');
+var userModel = mongoose.model('user');
+var tokenModel = mongoose.model('token');
 var itemModel = mongoose.model('item');
 
 //function receives and adds the array with tasks to mongo
@@ -19,8 +21,16 @@ async function list(file){
 }
 
     //GET ALL TASKS
-module.exports.searchItems = function(req, res){      
-    tasksModel.find({}, function(err, doc){
+module.exports.searchItems = function(req, res){ 
+    let parse_url = url.parse(req.url).query;
+    let title = qs.parse(parse_url).title;
+    let user_id = qs.parse(parse_url).user_id;
+    let order_by = qs.parse(parse_url).order_by;
+    let order_type = qs.parse(parse_url).order_type;
+    console.log(`/${title}/${user_id}/${order_by}/${order_type}`);
+    itemModel.find({}, function(err, doc){
+        console.log(`***************`);
+        console.log(doc);
         res.type('application/json');
         res.jsonp(doc);
     });      
@@ -73,22 +83,29 @@ module.exports.createGroup = async function(req, res){
 };	
 
 
-    //ADD NEW TASK
-module.exports.createTask = async function(req, res){
+    //ADD NEW ITEM
+module.exports.createItem = function(req, res){
     
-    await tasksModel.findOneAndUpdate({"_id": req.body.group._id},
-        {$push: {"tasks": {
-            name: req.body.name,
-            due_date: req.body.due_date,
-            description: req.body.description
-        }}},{upsert: true},async function(err, doc) {
-            if(err) return console.log(err);
-            console.log("New task was saved", req.body.name);
-        });
-    
-    tasksModel.find({}, function(err, doc){
-        res.type('application/json');
-        res.jsonp(doc); 
+    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+        if(doc){
+            userModel.findOne({"_id":doc.user_id}, function(err, doc){
+                
+                let item = {title: req.body.title,
+                            price: req.body.price,
+                            user_id: doc._id,
+                            user: doc
+                           };
+                
+                itemModel.create(item, function (err, doc) {
+                    if (err) return handleError(err);
+                    res.type('application/json');
+                    res.jsonp(doc);
+                })
+            }); 
+        } else  {
+            var resp = {"status":401, "field":"Unauthorized","message":"You should log in  again"};
+            res.jsonp(resp);
+        }
     });
 };	
 
