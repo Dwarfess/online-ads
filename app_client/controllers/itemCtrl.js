@@ -1,4 +1,4 @@
-app.controller("viewCtrl", function ($scope, $rootScope, $http, $location, transport){
+app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, transport){
     $scope.json = [{title:"Drill",
                     price:"5.00",
                     image:"",
@@ -30,25 +30,36 @@ app.controller("viewCtrl", function ($scope, $rootScope, $http, $location, trans
                    }
                   }];
     
+    $scope.order = [1,2];
+    //SEARCH ITEMS
+    $scope.search = {};
+    $scope.searchItems = function(search){
+
+        console.log(search);
+        
+//        $http.get('/api/item?title=book&user_id=1&order_by=created_at&order_type=desc').then(function (response) {
+//            console.log('success', response.data);// success
+//            $scope.json = response.data;
+//            $scope.currentView = "table";
+//
+//        }, function (data, status, headers, config) {
+//            console.log(data);
+//            console.log(status);
+//            console.log(headers);
+//            console.log(config);
+//        });
+    }
     
                     //OPTION FOR REGISTERED USERS
         
     //select pressed task 
     $scope.show = function(item){
-//        if(!$scope.online.logged){
-//            $scope.info = item;
-//            $scope.currentView = "info";
-        if($scope.online.logged){
-            $scope.info = item;
-            $location.path('/info');
-        }else{
-            $scope.$parent.bg = true; 
-            $scope.$parent.log = true;
-        }
+        $scope.info = item;
+        $location.path('/info');
     }
 
     //select pressed user with ads 
-    $scope.getUser = function(user){
+    $scope.getUserInfo = function(user){
         
 //        if(!$scope.online.logged){
 //            $scope.info = item;

@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var dbURI = 'mongodb://localhost/dnd';
+var dbURI = 'mongodb://localhost/ads';
 
 var options = {
     useMongoClient: true,
@@ -50,6 +50,7 @@ var gracefulShutdown = function(msg, callback) {
 	});
 };
 
-require('./usersSchema');
-require('./tasksSchema');
+require('./userSchema');
+require('./itemSchema');
+require('./tokenSchema');
 

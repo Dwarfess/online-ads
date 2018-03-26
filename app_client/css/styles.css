@@ -35,6 +35,9 @@ body {
 .btn-primary:active {
   background: #3399cc;
 }
+.btn-success:focus {
+  outline: none !important;
+}
 hr {
   margin: 25px 15px;
 }
@@ -383,7 +386,7 @@ hr {
 .logForm .well button {
   margin-left: 0;
 }
-.regForm {
+.updateForm {
   color: white;
   position: absolute;
   top: 95px;
@@ -391,7 +394,7 @@ hr {
   z-index: 999;
   background: rgba(0, 0, 0, 0.4);
 }
-.regForm .well {
+.updateForm .well {
   margin-bottom: 0;
   background: none !important;
 }

@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 //setting the schema
-var tasksScheme = new Schema({
+var itemScheme = new Schema({
     title: String,
     tasks: [{
         name: String,
@@ -12,4 +12,4 @@ var tasksScheme = new Schema({
     }]
 });
     
-mongoose.model("tasks", tasksScheme);//create module with schema
+mongoose.model("item", itemScheme);//create module with schema

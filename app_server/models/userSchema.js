@@ -6,8 +6,9 @@ mongoose.Promise = global.Promise;
 var userScheme = new Schema({
     name: String,
     email: String,
+    phone: String,
     password: String
 });
     
-mongoose.model("users", userScheme);//create module with schema
+mongoose.model("user", userScheme);//create module with schema
 

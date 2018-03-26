@@ -3,7 +3,7 @@ var url = require('url');
 var qs = require("querystring");
 
 var mongoose = require('mongoose');
-var tasksModel = mongoose.model('tasks');
+var itemModel = mongoose.model('item');
 
 //function receives and adds the array with tasks to mongo
 async function list(file){
@@ -19,7 +19,7 @@ async function list(file){
 }
 
     //GET ALL TASKS
-module.exports.getTasks = function(req, res){      
+module.exports.searchItems = function(req, res){      
     tasksModel.find({}, function(err, doc){
         res.type('application/json');
         res.jsonp(doc);

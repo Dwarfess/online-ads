@@ -6,15 +6,15 @@ var app = angular.module("app", ["ngRoute"])
             });
             $routeProvider.when('/info', {
                 templateUrl:'views/info.html',
-                controller:'viewCtrl'
+                controller:'itemCtrl'
             });
             $routeProvider.when('/edit', {
                 templateUrl:'views/edit.html',
-                controller:'viewCtrl'
+                controller:'itemCtrl'
             });
             $routeProvider.when('/userInfo', {
                 templateUrl:'views/userInfo.html',
-                controller:'viewCtrl'
+                controller:'itemCtrl'
             });
 
             $routeProvider.otherwise({redirectTo: '/'});

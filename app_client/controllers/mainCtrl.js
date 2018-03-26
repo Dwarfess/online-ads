@@ -26,19 +26,28 @@ app.controller("mainCtrl", function ($scope, $http, $window){
         $scope.user={};
         $scope.newUser={}; 
         $scope.newUser.email = "";
-        $scope.newUser2={};
     }
     
-    
-    //add new users
-    $scope.addNewUser = function (newUser) {        
-        $http.post('api/users', newUser).then(function (response) {
+    $scope.online = {"logged":true};//info about logged user
+    //LOGIN OR CREATE NEW USER
+    $scope.login = function(user){//for login into the site
+        $http.post("api/login", user).then(function (response) {
             console.log('success', response.data);// success
-            
-            if(response.data == "Error"){
-                $scope.existingLogin = true;//error - this login exists
-            }else{
+            if (response.data.token) {
+                $scope.token = response.data.token;
+                $scope.online.logged = false;//check logged in or not
+                $scope.online.login = response.data.name;//add user name
+                
                 $scope.showForms(false,false,false,false);
+                
+            } if (response.data.status == 422) {
+                $scope.createdUser = false;
+                $scope.wrongPass = response.data.message;
+                
+            } if (response.data.status == 2) {   
+                $scope.createdUser = true;
+                $scope.wrongPass = false;
+                $scope.user={};
             }
             
         }, function (data, status, headers, config) {
@@ -46,29 +55,42 @@ app.controller("mainCtrl", function ($scope, $http, $window){
             console.log(status);
             console.log(headers);
             console.log(config);
-        });       
+        });
     }
     
-    $scope.online = {"logged":true};//info about logged user
-    
-    $scope.logIn = function(){//for login into the site
-        $http.post("api/login", {email: $scope.user.email, password: $scope.user.pass}).then(function (response) {
+    //GET THE USER DATA
+    $scope.getUser = function(){
+        
+        $http.defaults.headers.common['Authorization'] = $scope.token;       
+        $http.get("api/me").then(function (response) {
             console.log('success', response.data);// success
-            if (response.data.email) {
-                $scope.online.logged = false;//check logged in or not
-                $scope.online.login = response.data.name;//add user name
+            if (response.data.name) {
+                $scope.currentUser = response.data;
+                $scope.showForms(true, false, true);
                 
+            } else if(response.data.status == 401) {
+                console.log(response.data.message);
+            }
+        }, function (data, status, headers, config) {
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });      
+    }
+    
+    $scope.updateUser = function(user){       
+        $http.defaults.headers.common['Authorization'] = $scope.token;
+        $http.patch("api/me", user).then(function (response) {
+            console.log('success', response.data);// success
+            if (response.data.name) {
+                $scope.online.login = response.data.name;//add user name
+                $scope.currentUser = response.data;
                 $scope.showForms(false,false,false,false);
                 
-            } if (response.data.status == 1) {
-                $scope.createdUser = false;
-                $scope.wrongPass = true;
-                
-            } if (response.data.status == 2) {   
-                $scope.createdUser = true;
-                $scope.wrongPass = false;
+            } else if(response.data.status == 401) {
+                console.log(response.data.message);
             }
-            
         }, function (data, status, headers, config) {
             console.log(data);
             console.log(status);
@@ -79,6 +101,7 @@ app.controller("mainCtrl", function ($scope, $http, $window){
     
     $scope.logOut = function(x){//for log out from the site
         $scope.online.logged = true;
+        $scope.token = '';
         
         $scope.$broadcast('currentView', {
             message: "table"
@@ -87,13 +110,13 @@ app.controller("mainCtrl", function ($scope, $http, $window){
     
     
                         //FOR ERRORS WHEN FILLING THE FORMS
-    $scope.getError = function (error, type) {
-        if (angular.isDefined(error)) {
-            if (error.email) {
-                return "Wrong email";
-            } else if (error.pattern && type){
-                return "Wrong password";
-            }
-        }
-    }
+//    $scope.getError = function (error, type) {
+//        if (angular.isDefined(error)) {
+//            if (error.email) {
+//                return "Wrong email";
+//            } else if (error.pattern && type){
+//                return "Wrong password";
+//            }
+//        }
+//    }
 });
