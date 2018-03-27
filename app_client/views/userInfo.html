@@ -8,7 +8,7 @@
                 <h5>Email: <span>{{userInfo.email}}</span></h5>
                 <h5>Advertisement:</h5>
                 <ul class="list-group">
-                    <li ng-repeat="item in userAds" class="list-group-item" ng-click = "show(item)">{{item.title}}, <span>${{item.price}}</span>
+                    <li ng-repeat="item in userAds" class="list-group-item" ng-click = "getItemById(item)">{{item.title}}, <span>${{item.price}}</span>
                     </li>
                 </ul>
             </div>

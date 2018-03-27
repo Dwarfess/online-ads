@@ -67,7 +67,7 @@ module.exports.createItem = function(req, res){
                 let item = {title: req.body.title,
                             price: req.body.price,
                             user_id: doc._id,
-                            image: 'img/1.jpg',
+                            image: '',
                             user: doc
                            };
                 
@@ -79,7 +79,7 @@ module.exports.createItem = function(req, res){
             }); 
         } else  {
             let resp = {"field":"title","message":"Title is required"};
-            res.status(422).jsonp(resp);;
+            res.status(422).jsonp(resp);
         }
     });
 };
@@ -145,54 +145,47 @@ module.exports.deleteItem = function(req, res){
     //ADD IMAGE TO ITEM
 module.exports.uploadImage = function(req, res){ 
     
-//    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
-//        if(doc){
-//            let user_id = doc.user_id;
-//            //find item
-//            itemModel.findOne({_id:req.params.id}, function(err, doc){
-//                if(doc){
-//                    if(user_id==doc.user_id){//check owner the ad
-//                        
-//                        var form = new formidable.IncomingForm();
-//                        form.parse(req, function (err, fields, files) {
-//                            var oldpath = files.filetoupload.path;
-//                            var newpath = 'C:/Users/Your Name/' + files.filetoupload.name;
-//                            fs.rename(oldpath, newpath, function (err) {
-//                                if (err) throw err;
-//                                
-//                                itemModel.findOneAndUpdate({_id:req.params.id},
-//                                {$set: {"image":newpath}
-//                                }, {new: true}, function(err,doc){
-//                                    console.log(`Image was added from ${doc.title}`);
-//                                    res.type('application/json');
-//                                    res.jsonp(doc);
-//                                });
-//
-//                            });
-//                        });
-//                    } else {
-//                        res.status(403).send("");
-//                    }
-//                } else {
-//                    res.status(404).send("");
-//                }
-//            });  
-//        } else  {
-//            res.status(401).send("");
-//        }
-//    });
-//    console.log("**************************");
-//    var form = new formidable.IncomingForm();
-//    form.parse(req, function (err, fields, files) {
-//      var oldpath = files.filetoupload.path;
-//      var newpath = 'C:/Users/Your Name/' + files.filetoupload.name;
-//      fs.rename(oldpath, newpath, function (err) {
-//        if (err) throw err;
-//        res.write('File uploaded and moved!');
-//        res.end();
-//      });
-//    });
-//    res.status(200).send('');
+    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+        if(doc){
+            let user_id = doc.user_id;
+            //find item
+            itemModel.findOne({_id:req.params.id}, function(err, doc){
+                if(doc){
+                    if(user_id==doc.user_id){//check owner the ad
+                        
+                        var form = new formidable.IncomingForm();
+                        form.parse(req, function (err, fields, files) {
+                            if(files.file){
+                                var oldpath = files.file.path;
+                                var newpath = './app_client/img/' + files.file.name;
+                                fs.rename(oldpath, newpath, function (err) {
+                                    //if (err) throw err;
+
+                                    itemModel.findOneAndUpdate({_id:req.params.id},
+                                    {$set: {"image":'img/' + files.file.name}
+                                    }, {new: true}, function(err,doc){
+                                        console.log(`Image was added from ${doc.title}`);
+                                        res.type('application/json');
+                                        res.jsonp(doc);
+                                    });
+
+                                });
+                            } else {
+                                let resp = {"field":"image","message":"At first choose some image"};
+                                res.status(422).jsonp(resp);
+                            }
+                        });
+                    } else {
+                        res.status(403).send("");
+                    }
+                } else {
+                    res.status(404).send("");
+                }
+            });  
+        } else  {
+            res.status(401).send("");
+        }
+    });
 }
 
 //DELETE IMAGE

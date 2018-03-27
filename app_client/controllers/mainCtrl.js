@@ -1,6 +1,7 @@
-app.controller("mainCtrl", function ($scope, $http, transport){
+app.controller("mainCtrl", function ($scope, $http, $location, transport){
 
     //present view
+    $location.path('/');
     
     
                         //FOR LOGIN AND REGISTRATION

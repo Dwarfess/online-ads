@@ -3,13 +3,14 @@
     <div class = "img">
         <input type="button" class = "btn" value = "✖" ng-click = "deleteImage(currentItem)" ng-show = "currentItem.image">
         <img ng-src="{{currentItem.image || 'img/default.png'}}">
-        <form action="">
-        <label class="btn btn-primary">
+        <label class="btn btn-primary" ng-show = "currentItem._id">
             Search for an image to change <input type="file" file-model = "img" hidden>
         </label>
-        </form> 
+        <label class="btn btn-primary" ng-show = "currentItem._id || img">
+            Save image <input type="button" ng-click = "uploadImage(currentItem._id)" hidden>
+        </label>
     </div> 
-    <button ng-click = "uploadImage(currentItem._id)">Save Image</button>   
+<!--    <button ng-click = "uploadImage(currentItem._id)">Save Image</button>   -->
     <form name = "createEdit" novalidate>
         <div class="form-group">
             <label>Title: *</label>

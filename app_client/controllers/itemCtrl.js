@@ -1,5 +1,5 @@
 app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, transport){
-    
+
     //SEARCH ITEMS
     $scope.search = {title:"", user_id:"", order_by:"created_at", order_type:"desc"};
     $scope.searchItems = function(search){
@@ -162,67 +162,23 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
         formData.append("file", $scope.img);
         $http.defaults.headers.common['Authorization'] = $scope.token;
         
-        $http.put(`/api/items/${id}/image`, formData, {
+        $http.put(`/api/item/${id}/image`, formData, {
            transformRequest: angular.identity,
            headers: {'Content-Type': undefined}
         }).then(function (response) {
+            $rootScope.currentItem = response.data;
             console.log('success', response.data);// success
             
         }, function (data, status, headers, config) {
             if(data.status == 401) console.log("You should log in again");
             if(data.status == 403) console.log("Forbidden change the ad");
             if(data.status == 404) console.log("Not found");
+            if(data.status == 422) console.log(data.data);
             console.log(data);
             console.log(status);
             console.log(headers);
             console.log(config);
         });
-        
-//        $http.defaults.headers.common['Authorization'] = $scope.token;
-//        $http.defaults.headers.common['Content-Type'] = 'multipart/form-data';
-//        $http.put(`/api/item/${id}/image`, formData).then(function (response) {
-//            console.log('success', response.data);// success
-//            
-//        }, function (data, status, headers, config) {
-//            if(data.status == 401) console.log("You should log in again");
-//            if(data.status == 403) console.log("Forbidden change the ad");
-//            if(data.status == 404) console.log("Not found");
-//            console.log(data);
-//            console.log(status);
-//            console.log(headers);
-//            console.log(config);
-//        });
-        
-//        $http({
-//            method: 'PUT',
-//            url: `/api/item/${id}/image`,
-//            headers: {
-//                'Authorization': $scope.token,
-//                'Content-Type': 'multipart/form-data'
-//            },
-//            data:
-//                formData
-//            
-//        }).
-//        then(function(result) {
-//            console.log(result);
-//            return result.data;
-//        });
-        
-        /*$http.defaults.headers.common['Authorization'] = $scope.token;
-        $http.post('api/items', item).then(function (response) {
-            if(response.data.title){
-                console.log(response.data);
-                $rootScope.info = response.data;
-                $location.path('/info');
-            } else console.log('success', response.data);// success
-            
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });*/
     }
     
     
@@ -248,6 +204,6 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
         });
         
         $scope.info = item;
-        $scope.currentView = "info"
+//        $scope.currentView = "info"
     }
 });
