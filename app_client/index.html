@@ -49,14 +49,9 @@
         </div>    
     </div>
     <hr>
+    
     <div class="container" ng-controller="itemCtrl"> 
-    <ng-view></ng-view>
-<!--
-        <ng-view src="'views/table.html'" ng-show="currentView == 'table'"></ng-view>
-        <ng-view src="'views/info.html'" ng-show="currentView == 'info'"></ng-view>
-        <ng-view src="'views/edit.html'" ng-show="currentView == 'edit'"></ng-view>
-        <ng-view src="'views/userInfo.html'" ng-show="currentView == 'userInfo'"></ng-view>
--->
+        <ng-view></ng-view>
     </div>
         
                                     <!--forms-->
@@ -68,12 +63,7 @@
                        
             <div class="form-group">
                 <label>Email:</label>
-                <input name="userEmail" type="email" class="form-control"  ng-model="user.email" placeholder="name@address.com" ng-focus="createdUser=false" ng-pattern = '/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i' required>
-                
-                <!--for error-->
-                <div class="currect" ng-show="createdUser">
-                    user was created
-                </div>
+                <input name="userEmail" type="email" class="form-control"  ng-model="user.email" placeholder="name@address.com"ng-pattern = '/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i' required>
             </div>
 
             <div class="form-group">
@@ -97,8 +87,13 @@
         <div class="well">
             <div class="form-group">
                 <label>Name:</label>
-                <input name="userName" type="text" class="form-control" ng-model="currentUser.name" placeholder="Your name" required>
+                <input name="userName" type="text" class="form-control" ng-model="currentUser.name" ng-focus="invalidName=false" placeholder="Your name" required>
             </div>
+            <!--for error-->
+            <div class="error" ng-show="invalidName">
+                {{invalidName}}
+            </div>
+                
             <div class="form-group">
                 <label>Email:</label>
                 <input name="userEmail" type="email" class="form-control"  ng-model="currentUser.email" placeholder="name@address.com" ng-pattern = '/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i'>

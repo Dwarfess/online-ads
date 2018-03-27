@@ -5,7 +5,7 @@ var tokenModel = mongoose.model('token');
 //LOGIN OR CREATE NEW USER
 module.exports.login = function(req, res){  
     //regular for checking login
-    var regex = new RegExp(["^", req.body.email, "$"].join(""), "i");
+    let regex = new RegExp(["^", req.body.email, "$"].join(""), "i");
     userModel.findOne({"email":regex}, function(err, doc){
         if(doc){
             if(doc.password == req.body.password){
@@ -24,7 +24,7 @@ module.exports.login = function(req, res){
             }
         } else{
             var newUser = new userModel({
-                name: `User_${Math.floor(Math.random()*1000000)}`,
+                name: 'User',
                 email: req.body.email,
                 password: req.body.password
             });
@@ -63,22 +63,32 @@ module.exports.getUser = function(req, res){
 //EDIT CURRENT USER
 module.exports.editUser = function(req, res){ 
     function checkParams(obj) {
+        let regexName = /^[a-zA-Z]{3,15}$/i;
+        let regexEmail = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        let regexPhone = /^$|^[+](\d{2} )[(](\d{3})[)]( \d{3})( \d{2}){2}$/;
+        
+        console.log("*********************************")
+        console.log(obj.phone);
+        console.log(regexPhone.test(obj.phone));
+        
         let result = {status: true, msg: []};
-        if (obj.name.length < 3) {
+        if (!regexName.test(obj.name)) {
             result.status = false;
-            result.msg.push({field: "name", message:"Name error"});
+            result.msg.push({field: "name", message:"invalid name"});
         }
-        if (obj.email.length < 3) {
+        if (!regexEmail.test(obj.email)) {
             result.status = false;
             result.msg.push({field: "email", message:"Email error"});
         }
-        if (obj.phone.length < 3) {
-            result.status = false;
-            result.msg.push({field: "phone", message:"Phone error"});
-        }
+        if (obj.phone) {
+            if (!regexPhone.test(obj.phone)) {
+                result.status = false;
+                result.msg.push({field: "phone", message:"Phone error"});
+            }
+        } 
         return result;
     }
-    console.log(req);
+
     let chk = checkParams(req.body);
     console.log(chk);
     if (!chk.status) {
@@ -93,7 +103,7 @@ module.exports.editUser = function(req, res){
                        "email":req.body.email,
                        "phone":req.body.phone}
                 }, {new: true}, function(err,doc){
-                    if(err) return console.log(err);
+//                    if(err) return console.log(err);
                     console.log(`User ${doc.name} was updated`);
                     res.type('application/json');
                     res.jsonp(doc);

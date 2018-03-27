@@ -8,8 +8,8 @@ app.controller("mainCtrl", function ($scope, $http, transport){
     $scope.log = false;//form for login
     $scope.reg = false;//form for registration
     
-    $scope.existingLogin = false;
-    $scope.wrongLogin = false;
+    $scope.invalidName = false;
+    $scope.wrongEmail = false;
     $scope.wrongPass = false;
     
     $scope.showForms = function(x,y,z,h){  //fuction for bg, log and reg
@@ -18,7 +18,7 @@ app.controller("mainCtrl", function ($scope, $http, transport){
         $scope.reg = z;
         
         //cleans form messages
-        $scope.createdUser = h;
+        $scope.invalidName = h;
         $scope.wrongEmail = h;
         $scope.wrongPass = h;
         
@@ -85,17 +85,16 @@ app.controller("mainCtrl", function ($scope, $http, transport){
         $http.defaults.headers.common['Authorization'] = $scope.token;
         $http.patch("api/me", user).then(function (response) {
             console.log('success', response.data);// success
-            if (response.data.name) {
                 $scope.online.login = response.data.name;//add user name
                 $scope.currentUser = response.data;
                 $scope.showForms(false,false,false,false);
-            }
         }, function (data, status, headers, config) {
             if(data.status == 401) {
                 console.log("You should log in again");
             }
             if(data.status == 422) {
                 console.log(data.data);
+                if(data.data[0].field=="name") $scope.invalidName = data.data[0].message;
             }
             
             console.log(data);
@@ -111,15 +110,4 @@ app.controller("mainCtrl", function ($scope, $http, transport){
         transport.setToken($scope.token);//send token with service
     }
     
-    
-                        //FOR ERRORS WHEN FILLING THE FORMS
-//    $scope.getError = function (error, type) {
-//        if (angular.isDefined(error)) {
-//            if (error.email) {
-//                return "Wrong email";
-//            } else if (error.pattern && type){
-//                return "Wrong password";
-//            }
-//        }
-//    }
 });

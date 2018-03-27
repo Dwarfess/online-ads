@@ -14,22 +14,18 @@ module.exports.searchItems = function(req, res){
     let user_id = qs.parse(parse_url).user_id;
     let order_by = qs.parse(parse_url).order_by;
     let order_type = qs.parse(parse_url).order_type;
-    let order = -1;
-    if (order_type == "asc") order = 1;
-    console.log(`/${title}/${user_id}/${order_by}/${order_type}`);
+    
     let find = title ? {"title":title} : {};
-    if (user_id != "") {
-        find.user_id = user_id;
-    }
-    
-    
-    let sortObj = null;
+    let order = (order_type == "asc") ? 1 : -1;  
+    if (user_id != "") find.user_id = user_id;
+
+    let sort = null;
     switch (order_by) {
-        case "created_at": sortObj = {created_at: order};break;
-        case "price": sortObj = {price: order};break;
+        case "created_at": sort = {created_at: order};break;
+        case "price": sort = {price: order};break;
     }
-    console.log(sortObj);
-    itemModel.find(find, null/*["created_at", "title", "price", "user_id", "user"]*/,{sort: sortObj}, function(err, doc){
+
+    itemModel.find(find, null,{sort: sort}, function(err, doc){
         res.type('application/json');
         res.jsonp(doc);
     });  

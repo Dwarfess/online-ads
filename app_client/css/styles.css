@@ -78,20 +78,24 @@ hr {
   outline: inherit;
   background: none;
   font-size: 120%;
-}
-.header .search select,
-.header .search button {
   padding: 5px;
-  border-left: 1px solid grey;
-  color: grey;
+}
+.header .search input {
+  border-right: 1px solid grey;
+}
+.header .search input:nth-of-type(2) {
+  width: 70px;
 }
 .header .search select {
+  border-right: 1px solid grey;
+  color: grey;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
 .header .search button {
-  padding-left: 10px;
+  padding: 5px 5px 5px 10px;
+  color: grey;
 }
 .header .search button:active {
   color: #5a5a5a;
@@ -402,11 +406,6 @@ span.summary.ng-invalid,
 .error {
   text-align: center;
   color: #FE5E6D;
-  font-weight: bold;
-}
-.currect {
-  text-align: center;
-  color: #68B631;
   font-weight: bold;
 }
 .col-lg-1 {
