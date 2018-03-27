@@ -1,41 +1,8 @@
 app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, transport){
-
-    $rootScope.json = [{title:"Drill",
-                    price:"5.00",
-                    image:"",
-                    created_at: "2018-03-15T15:38:21.523+0000",
-                    user:{
-                       name:"Ivan",
-                       phone:"+38(098)123 54 04",
-                       email:"ivan@ua.fm"
-                    }
-                   },
-                  {title:"Headphone Black",
-                   price:"10.00",
-                   image:"img/1.jpg",
-                   created_at: "2018-03-15T15:38:21.523+0000",
-                   user:{
-                       name:"Ivan  Michelivier Dev",
-                       phone:"+38(098)123 54 04",
-                       email:"ivan@ua.fm"
-                   }
-                  },
-                  {title:"Fridge New Super Technology Native Speaker Virification",
-                   price:"25.00",
-                   image: "img/1.jpg",
-                   created_at: "2018-03-15T15:38:21.523+0000",
-                   user:{
-                       name:"Ivan",
-                       phone:"+38(098)123 54 04",
-                       email:"ivan@ua.fm"
-                   }
-                  }];
     
     //SEARCH ITEMS
     $scope.search = {title:"", user_id:"", order_by:"created_at", order_type:"desc"};
     $scope.searchItems = function(search){
-
-        console.log(search);
         
         $http.get(`/api/item?title=${search.title}&user_id=${search.user_id}&order_by=${search.order_by}&order_type=${search.order_type}`).then(function (response) {
             console.log('success', response.data);// success
@@ -52,33 +19,39 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
     
                     //OPTION FOR REGISTERED USERS
         
-    //select pressed task 
-    $scope.show = function(item){
-        $scope.info = item;
-        $location.path('/info');
+    //select pressed item 
+    $scope.getItemById = function(item){
+        $http.get(`/api/item/${item._id}`).then(function (response) {
+            console.log('success', response.data);// success
+            $rootScope.info = response.data;
+            $location.path('/info');
+
+        }, function (data, status, headers, config) {
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
     }
 
     //select pressed user with ads 
-    $scope.getUserInfo = function(user){
-
-        $rootScope.userInfo = user;
-        $rootScope.userAds = $scope.json;
-    //            transport.setCurrent(user);
-    //            transport.setCurrent($scope.json);
-    //            $scope.userInfo = transport.getCurrent();
-        $location.path('/userInfo');
-//
-//            $http.get('/api/user/<id>').then(function (response) {
-//                console.log('success', response.data);// success
-//                $scope.json = response.data;
-//                $scope.currentView = "table";
-//
-//            }, function (data, status, headers, config) {
-//                console.log(data);
-//                console.log(status);
-//                console.log(headers);
-//                console.log(config);
-//            });
+    $scope.getUserItems = function(user){
+        
+        $http.get(`/api/items/${user._id}`).then(function (response) {
+            console.log('success', response.data);// success
+            $rootScope.userInfo = user;
+            $rootScope.userAds = response.data;
+            $location.path('/userInfo'); 
+            
+        }, function (data, status, headers, config) {
+            if(data.status == 401) console.log("You should log in again");
+            if(data.status == 403) console.log("Forbidden change the ad");
+            if(data.status == 404) console.log("Not found");
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
     }
     
     //return to present view
@@ -86,10 +59,8 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
         $location.path('/');
     }
     
-    //edit or create new task
+    //edit or create new item
     $scope.editOrCreate = function (item, view, currentView, showGroup) {
-        //$scope.token = transport.getToken();
-        console.log($scope.token);
         if($scope.token){
             $rootScope.currentItem = item ? angular.copy(item) : {};
             $location.path(`/${currentView}`);
@@ -101,16 +72,16 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
     $scope.saveEdit = function (item) {
         if (angular.isDefined(item._id)) {
             console.log("=========== update");
-            $scope.updateTask(item);
+            $scope.updateItem(item);
         } else {
             console.log("=========== create");
             $scope.createItem(item);
         }
     }    
     
-    //ADD NEW TASK
+    //ADD NEW ITEM
     $scope.createItem = function (item) {
-        
+
         $http.defaults.headers.common['Authorization'] = $scope.token;
         $http.post('api/items', item).then(function (response) {
             if(response.data.title){
@@ -126,36 +97,27 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
             console.log(config);
         });
     }
-
-    //DELETE THE TASK FROM THE GROUP
-    $scope.deleteTask = function (item) {
-        $scope.json.forEach(function (e, i) {
-            if (e.tasks.indexOf(item) >= 0)
-                e.tasks.splice(e.tasks.indexOf(item), 1);
-        });
-        
-        $http.delete('api/deleteTask?id='+item._id).then(function (response) {
-            console.log('success', response.data);// success
-            $scope.json = response.data;
-            
-        }, function (data, status, headers, config) {
-            console.log(data);
-            console.log(status);
-            console.log(headers);
-            console.log(config);
-        });
-        
-        $scope.currentView = "table";
-    }
     
     
-    //UPDATE TASK
-    $scope.updateTask = function (item) {
-        $http.put('api/update', item).then(function (response) {
+    //cancel changes and return to present table
+    $scope.cancelEdit = function (item) {
+        $rootScope.info = $rootScope.currentItem;
+        $scope.currentItem = {};
+        $location.path(`/${$rootScope.view}`);
+    }    
+    
+    //UPDATE ITEM
+    $scope.updateItem = function (item) {
+        $http.defaults.headers.common['Authorization'] = $scope.token;        
+        $http.patch(`/api/item/${item._id}`, {title:item.title, price:item.price}).then(function (response) {
             console.log('success', response.data);// success
-            $scope.json = response.data;
+            $rootScope.info = response.data;
+            $location.path('/info'); 
             
         }, function (data, status, headers, config) {
+            if(data.status == 401) console.log("You should log in again");
+            if(data.status == 403) console.log("Forbidden change the ad");
+            if(data.status == 404) console.log("Not found");
             console.log(data);
             console.log(status);
             console.log(headers);
@@ -165,10 +127,127 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
         $scope.info = item;
         $scope.currentView = "info"
     }
+    
+    
+    //DELETE TASK
+    $scope.deleteItem = function (item) {
+        
+        $http.defaults.headers.common['Authorization'] = $scope.token;        
+        $http.delete(`/api/item/${item._id}`).then(function (response) {
+            //delete the item from array            
+            $rootScope.json.splice($rootScope.json.indexOf($rootScope.json.filter(x => x._id===item._id)[0]), 1);
+            
+            $location.path('/table'); 
+            
+        }, function (data, status, headers, config) {
+            if(data.status == 204) console.log("The item was deleted123");
+            if(data.status == 401) console.log("You should log in again");
+            if(data.status == 403) console.log("Forbidden change the ad");
+            if(data.status == 404) console.log("Not found");
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
+        
+        $scope.info = item;
+        $scope.currentView = "info"
+    }
+    
+    
+        //ADD IMAGE TO THE ITEM
+    $scope.uploadImage = function (id) {
 
-    //cancel changes and return to present table
-    $scope.cancelEdit = function (item) {
-        $scope.currentItem = {};
-        $location.path(`/${$rootScope.view}`);
+        let formData = new FormData();
+        formData.append("file", $scope.img);
+        $http.defaults.headers.common['Authorization'] = $scope.token;
+        
+        $http.put(`/api/items/${id}/image`, formData, {
+           transformRequest: angular.identity,
+           headers: {'Content-Type': undefined}
+        }).then(function (response) {
+            console.log('success', response.data);// success
+            
+        }, function (data, status, headers, config) {
+            if(data.status == 401) console.log("You should log in again");
+            if(data.status == 403) console.log("Forbidden change the ad");
+            if(data.status == 404) console.log("Not found");
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
+        
+//        $http.defaults.headers.common['Authorization'] = $scope.token;
+//        $http.defaults.headers.common['Content-Type'] = 'multipart/form-data';
+//        $http.put(`/api/item/${id}/image`, formData).then(function (response) {
+//            console.log('success', response.data);// success
+//            
+//        }, function (data, status, headers, config) {
+//            if(data.status == 401) console.log("You should log in again");
+//            if(data.status == 403) console.log("Forbidden change the ad");
+//            if(data.status == 404) console.log("Not found");
+//            console.log(data);
+//            console.log(status);
+//            console.log(headers);
+//            console.log(config);
+//        });
+        
+//        $http({
+//            method: 'PUT',
+//            url: `/api/item/${id}/image`,
+//            headers: {
+//                'Authorization': $scope.token,
+//                'Content-Type': 'multipart/form-data'
+//            },
+//            data:
+//                formData
+//            
+//        }).
+//        then(function(result) {
+//            console.log(result);
+//            return result.data;
+//        });
+        
+        /*$http.defaults.headers.common['Authorization'] = $scope.token;
+        $http.post('api/items', item).then(function (response) {
+            if(response.data.title){
+                console.log(response.data);
+                $rootScope.info = response.data;
+                $location.path('/info');
+            } else console.log('success', response.data);// success
+            
+        }, function (data, status, headers, config) {
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });*/
+    }
+    
+    
+    //DELETE IMAGE
+    $scope.deleteImage = function (item) {
+        
+        $http.defaults.headers.common['Authorization'] = $scope.token;        
+        $http.delete(`/api/item/${item._id}/image`).then(function (response) {
+            //delete image from the item            
+            $scope.currentItem.image = ""
+            
+            $location.path('/edit'); 
+            
+        }, function (data, status, headers, config) {
+            if(data.status == 204) console.log("The item was deleted123");
+            if(data.status == 401) console.log("You should log in again");
+            if(data.status == 403) console.log("Forbidden change the ad");
+            if(data.status == 404) console.log("Not found");
+            console.log(data);
+            console.log(status);
+            console.log(headers);
+            console.log(config);
+        });
+        
+        $scope.info = item;
+        $scope.currentView = "info"
     }
 });

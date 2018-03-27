@@ -14,10 +14,10 @@
                 
                 <input type = "button" class="btn btn-sm btn-primary" ng-click="editOrCreate(info, 'info', 'edit', false)" value = "Edit">
 
-                <input type = "button" class="btn btn-sm btn-primary" ng-click="deleteTask(info)" value = "Delete">
+                <input type = "button" class="btn btn-sm btn-primary" ng-click="deleteItem(info)" value = "Delete">
             </div>
             
-            <div class="userInfo" ng-click="getUserInfo(info.user)">
+            <div class="userInfo" ng-click="getUserItems(info.user)">
                 <h4>{{info.user.name}}</h4>
                 <h5>{{info.user.phone}}</h5>
                 <h5>{{info.user.email}}</h5>

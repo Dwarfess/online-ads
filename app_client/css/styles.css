@@ -28,6 +28,7 @@ body {
 }
 .btn-primary:focus {
   outline: none !important;
+  background: #3399cc;
 }
 .btn-primary:hover {
   background: #5cadd6;
@@ -62,6 +63,9 @@ hr {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+}
+.header .logo:focus {
+  outline: none !important;
 }
 .header .search {
   display: inline-block;

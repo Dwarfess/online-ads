@@ -10,6 +10,7 @@
     <script src="libraries/angular-route.min.js"></script>	
 	<script src="app.js"></script>
 	<script src="services/transport.js"></script>
+	<script src="services/directive.js"></script>
 	<script src="controllers/mainCtrl.js"></script>
 	<script src="controllers/itemCtrl.js"></script>
 	
@@ -20,8 +21,8 @@
     <div class="panel-heading header">
         <hr>
         <div class="container">
-            <div class = "logo">
-            </div>
+            <a href = "#/" class = "logo">
+            </a>
             
             <form class = "search" ng-controller = "itemCtrl">
                 <input type="text" ng-model = "search.title" placeholder="search">
@@ -109,7 +110,6 @@
             <a class="btn btn-primary btn-block" ng-click = "showForms(false, false, false, false)">Cancel</a>
         </div>
     </form>
-    
-    
+  
 </body>
 </html>

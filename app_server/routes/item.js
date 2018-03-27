@@ -1,23 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var app = express();
-
-var itemCtrl = require('../controllers/itemCtrl');
-
-router.get('/api/item', itemCtrl.searchItems);//get all the tasks
-
-router.post('/api/items', itemCtrl.createItem);//create new task
-//router.get('/api/reset', productCtrl.reset);//reset to default
 //
-//router.post('/api/saveMoving', tasksCtrl.saveMoving);//save moving tasks 
-//router.post('/api/group', tasksCtrl.createGroup);//create new group
-
+//var itemCtrl = require('../controllers/itemCtrl');
 //
-//router.delete('/api/deleteGroup', tasksCtrl.deleteGroup);//delete the group
-//router.delete('/api/deleteTask', tasksCtrl.deleteTask);//delete the task
-//
-//router.put('/api/update', tasksCtrl.update);//update the task
-
-
-
-module.exports = router;
+//router.get('/api/item', itemCtrl.searchItems);//get all the tasks
+//router.get('/api/item/:id', itemCtrl.getItemById);//get item by id
+//router.get('/api/items/:id', itemCtrl.getUserItems);//get all the user items
+//router.patch('/api/item/:id', itemCtrl.updateItem);//update current item
+//router.delete('/api/item/:id', itemCtrl.deleteItem);//delete current item
+//router.post('/api/items', itemCtrl.createItem);//create new item
+//router.put('/api/item/:id/image', itemCtrl.uploadImage);//add image to the item
+//router.delete('/api/item/:id/image', itemCtrl.deleteImage);//delete image from the item

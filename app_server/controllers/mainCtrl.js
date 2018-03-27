@@ -18,12 +18,12 @@ module.exports.login = function(req, res){
                     res.jsonp(user)
                 }); 
             } else  {
-                var resp = {"field":"password","message":"Wrong password"};
+                let resp = {"field":"password","message":"Wrong password"};
                 res.status(422).jsonp(resp);
                 console.log("Wrong password");
             }
         } else{
-            var newUser = new userModel({
+            let newUser = new userModel({
                 name: 'User',
                 email: req.body.email,
                 password: req.body.password
@@ -67,10 +67,6 @@ module.exports.editUser = function(req, res){
         let regexEmail = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
         let regexPhone = /^$|^[+](\d{2} )[(](\d{3})[)]( \d{3})( \d{2}){2}$/;
         
-        console.log("*********************************")
-        console.log(obj.phone);
-        console.log(regexPhone.test(obj.phone));
-        
         let result = {status: true, msg: []};
         if (!regexName.test(obj.name)) {
             result.status = false;
@@ -98,12 +94,12 @@ module.exports.editUser = function(req, res){
     
     tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
         if(doc){
+            
             userModel.findOneAndUpdate({"_id":doc.user_id},
                 {$set: {"name":req.body.name,
                        "email":req.body.email,
                        "phone":req.body.phone}
                 }, {new: true}, function(err,doc){
-//                    if(err) return console.log(err);
                     console.log(`User ${doc.name} was updated`);
                     res.type('application/json');
                     res.jsonp(doc);

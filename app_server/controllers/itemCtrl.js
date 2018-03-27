@@ -1,4 +1,5 @@
 var fs = require("fs");
+var formidable = require('formidable');
 var url = require('url');
 var qs = require("querystring");
 
@@ -28,60 +29,37 @@ module.exports.searchItems = function(req, res){
     itemModel.find(find, null,{sort: sort}, function(err, doc){
         res.type('application/json');
         res.jsonp(doc);
-    });  
-    
-};
-
-    //SAVE MOVING TASKS
-module.exports.saveMoving = async function(req, res){ 
-    
-    await tasksModel.remove({}, async function (err) {
-        if (err) return handleError(err);
-    });
-        
-    await (list(req.body));//function receives and adds the array with tasks to mongo
-            
-    tasksModel.find({}, function(err, doc){
-        res.type('application/json');
-        res.jsonp(doc);
-    });     
-};
-
-    //RESET TO DEFAULT
-module.exports.reset = async function(req, res){ 
-
-    await tasksModel.remove({}, async function (err) {
-        if (err) return handleError(err);
-    });
-    
-    let file = JSON.parse(fs.readFileSync('app_client/tasks.json', 'utf8'));
-    await (list(file));//function receives and adds the array with tasks to mongo
-    
-    tasksModel.find({}, function(err, doc){
-        res.type('application/json');
-        res.jsonp(doc); 
-    });      
+    });    
 };
 
 
-    //CREATE NEW GROUP
-module.exports.createGroup = async function(req, res){
-    var newGroup = new tasksModel({title:req.body.title});       
-    await newGroup.save(async function(err){                
-        if(err) return console.log(err);
-        console.log("New group was saved", req.body.title);
-    });
-    
-    tasksModel.find({}, function(err, doc){
-        res.type('application/json');
-        res.jsonp(doc); 
-    });
-};	
+    //GET ITEM BY ID
+module.exports.getItemById = function(req, res){ 
+    itemModel.findOne({_id:req.params.id}, function(err, doc){
+        if(doc){
+            res.type('application/json');
+            res.jsonp(doc);
+        } else {
+            res.status(404).send("");
+        }
+    });    
+};
 
+
+    //GET ALL THE USER ITEMS
+module.exports.getUserItems = function(req, res){ 
+    itemModel.find({user_id:req.params.id}, function(err, doc){
+        if(doc){
+            res.type('application/json');
+            res.jsonp(doc);
+        } else {
+            res.status(404).send("");
+        }
+    });    
+};
 
     //ADD NEW ITEM
-module.exports.createItem = function(req, res){
-    
+module.exports.createItem = function(req, res){ 
     tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
         if(doc){
             userModel.findOne({"_id":doc.user_id}, function(err, doc){
@@ -89,6 +67,7 @@ module.exports.createItem = function(req, res){
                 let item = {title: req.body.title,
                             price: req.body.price,
                             user_id: doc._id,
+                            image: 'img/1.jpg',
                             user: doc
                            };
                 
@@ -99,61 +78,148 @@ module.exports.createItem = function(req, res){
                 });
             }); 
         } else  {
-            var resp = {"status":401, "field":"Unauthorized","message":"You should log in  again"};
-            res.jsonp(resp);
+            let resp = {"field":"title","message":"Title is required"};
+            res.status(422).jsonp(resp);;
         }
     });
-};	
-
-
-
-    //DELETE THE GROUP
-module.exports.deleteGroup = async function(req, res){
-    let parse_url = url.parse(req.url).query;
-    let id = qs.parse(parse_url).id;
-
-    //find the task by id and delete
-    await tasksModel.remove({"_id":id}, async function(err, doc){
-        console.log("The group was deleted");
-    });
-    
-    tasksModel.find({}, function(err, doc){
-        res.type('application/json');
-        res.jsonp(doc); 
-    });
-  
 };
 
-    //DELETE THE TASK FROM THE GROUP
-module.exports.deleteTask = async function(req, res){
-    let parse_url = url.parse(req.url).query;
-    let id = qs.parse(parse_url).id;
-
-    await tasksModel.update({},{$pull:{"tasks":{"_id":id}}},{multi:true}, async function(err, doc){
-        console.log("The task was deleted"); 
-    });
-    
-    tasksModel.find({}, function(err, doc){
-        console.log(`************* return`);
-        res.type('application/json');
-        res.jsonp(doc); 
+    //UPDATE ITEM
+module.exports.updateItem = function(req, res){
+    //find token
+    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+        if(doc){
+            let user_id = doc.user_id;
+            //find item
+            itemModel.findOne({_id:req.params.id}, function(err, doc){
+                if(doc){
+                    if(user_id==doc.user_id){//check owner the ad
+                        itemModel.findOneAndUpdate({_id:req.params.id},
+                            {$set: {"title":req.body.title,
+                                   "price":req.body.price}
+                            }, {new: true}, function(err,doc){
+                                console.log(`Item ${doc.title} was updated`);
+                                res.type('application/json');
+                                res.jsonp(doc);
+                            });
+                    } else {
+                        res.status(403).send("");
+                    }
+                } else {
+                    res.status(404).send("");
+                }
+            });  
+        } else  {
+            res.status(401).send("");
+        }
     });
 };
 
-    //UPDATE TASK
-module.exports.update = async function(req, res){
-    
-    await tasksModel.updateOne({"tasks._id": req.body._id},
-                         { $set: { "tasks.$.name":req.body.name,
-                                   "tasks.$.due_date":req.body.due_date,
-                                   "tasks.$.description":req.body.description
-                                 }}, async function(err,doc){
-        console.log(`That task was updated ${req.body.name}`);
+//DELETE ITEM
+module.exports.deleteItem = function(req, res){
+
+    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+        if(doc){
+            let user_id = doc.user_id;
+            //find item
+            itemModel.findOne({_id:req.params.id}, function(err, doc){
+                if(doc){
+                    if(user_id==doc.user_id){//check owner the ad
+                        itemModel.remove({"_id":req.params.id}, function(err, doc){
+                            res.status(204).send(""); 
+                        });
+                    } else {
+                        res.status(403).send("");
+                    }
+                } else {
+                    res.status(404).send("");
+                }
+            });  
+        } else  {
+            res.status(401).send("");
+        }
     });
+};
+
+
+    //ADD IMAGE TO ITEM
+module.exports.uploadImage = function(req, res){ 
     
-    tasksModel.find({}, function(err, doc){
-        console.log(`************* return update ${req.body.name}`);
-        res.type('application/json');
-        res.jsonp(doc); 
+//    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+//        if(doc){
+//            let user_id = doc.user_id;
+//            //find item
+//            itemModel.findOne({_id:req.params.id}, function(err, doc){
+//                if(doc){
+//                    if(user_id==doc.user_id){//check owner the ad
+//                        
+//                        var form = new formidable.IncomingForm();
+//                        form.parse(req, function (err, fields, files) {
+//                            var oldpath = files.filetoupload.path;
+//                            var newpath = 'C:/Users/Your Name/' + files.filetoupload.name;
+//                            fs.rename(oldpath, newpath, function (err) {
+//                                if (err) throw err;
+//                                
+//                                itemModel.findOneAndUpdate({_id:req.params.id},
+//                                {$set: {"image":newpath}
+//                                }, {new: true}, function(err,doc){
+//                                    console.log(`Image was added from ${doc.title}`);
+//                                    res.type('application/json');
+//                                    res.jsonp(doc);
+//                                });
+//
+//                            });
+//                        });
+//                    } else {
+//                        res.status(403).send("");
+//                    }
+//                } else {
+//                    res.status(404).send("");
+//                }
+//            });  
+//        } else  {
+//            res.status(401).send("");
+//        }
+//    });
+//    console.log("**************************");
+//    var form = new formidable.IncomingForm();
+//    form.parse(req, function (err, fields, files) {
+//      var oldpath = files.filetoupload.path;
+//      var newpath = 'C:/Users/Your Name/' + files.filetoupload.name;
+//      fs.rename(oldpath, newpath, function (err) {
+//        if (err) throw err;
+//        res.write('File uploaded and moved!');
+//        res.end();
+//      });
+//    });
+//    res.status(200).send('');
+}
+
+//DELETE IMAGE
+module.exports.deleteImage = function(req, res){
+
+    tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
+        if(doc){
+            let user_id = doc.user_id;
+            //find item
+            itemModel.findOne({_id:req.params.id}, function(err, doc){
+                if(doc){
+                    if(user_id==doc.user_id){//check owner the ad
+                        itemModel.findOneAndUpdate({_id:req.params.id},
+                            {$set: {"image":""}
+                            }, {new: true}, function(err,doc){
+                                console.log(`Image was deleted from ${doc.title}`);
+                                res.status(204).send("");
+                            });
+                    } else {
+                        res.status(403).send("");
+                    }
+                } else {
+                    res.status(404).send("");
+                }
+            });  
+        } else  {
+            res.status(401).send("");
+        }
     });
 };

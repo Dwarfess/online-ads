@@ -1,12 +1,15 @@
 
 <div class="panel-body panel edit">
     <div class = "img">
-        <input type="button" class = "btn" value = "✖" ng-click = "deleteCategory($index)" ng-show = "currentItem.image">
+        <input type="button" class = "btn" value = "✖" ng-click = "deleteImage(currentItem)" ng-show = "currentItem.image">
         <img ng-src="{{currentItem.image || 'img/default.png'}}">
+        <form action="">
         <label class="btn btn-primary">
-            Search for an image to change <input type="file" hidden>
-        </label>           
-    </div>  
+            Search for an image to change <input type="file" file-model = "img" hidden>
+        </label>
+        </form> 
+    </div> 
+    <button ng-click = "uploadImage(currentItem._id)">Save Image</button>   
     <form name = "createEdit" novalidate>
         <div class="form-group">
             <label>Title: *</label>
@@ -15,14 +18,14 @@
 		
         <div class="form-group">
             <label>Price: *</label>
-            <input class="form-control" ng-model="currentItem.price" ng-focus="$parent.wrongDate=false" required/>
+            <input class="form-control" ng-model="currentItem.price" ng-focus="$parent.wrongDate=false" ng-pattern = '/^\d*\.?\d{2}$/' required/>
         </div>
 		<!--for error-->
-        <div class="error" ng-show="wrongDate">
-            the date was entered incorrectly
+        <div class="error" ng-show="wrongPrice">
+            the price was entered incorrectly
         </div>
 
         <button class="btn btn-primary" ng-disabled="createEdit.$invalid" ng-click="saveEdit(currentItem)">Save</button> 
-        <button class="btn btn-primary" ng-click="cancelEdit(null, 'edit')">Cancel</button>
+        <button class="btn btn-primary" ng-click="cancelEdit(currentItem, 'edit')">Cancel</button>
     </form>
 </div>

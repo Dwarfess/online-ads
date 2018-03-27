@@ -4,8 +4,7 @@
         <div class = "itemInfo">
             <h4>{{userInfo.name}}</h4>
             <div class = "itemInfo__top">
-<!--                <h5>Phone: <span>{{transport.getCurrent().phone}}</span></h5>-->
-                <h5>Phone: <span>{{userInfo.phone}}</span></h5>
+                <h5 ng-show = "userInfo.phone">Phone: <span>{{userInfo.phone}}</span></h5>
                 <h5>Email: <span>{{userInfo.email}}</span></h5>
                 <h5>Advertisement:</h5>
                 <ul class="list-group">
