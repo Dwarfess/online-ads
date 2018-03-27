@@ -18,8 +18,8 @@ module.exports.login = function(req, res){
                     res.jsonp(user)
                 }); 
             } else  {
-                var resp = {"status":422, "field":"password","message":"Wrong password"};
-                res.jsonp(resp);
+                var resp = {"field":"password","message":"Wrong password"};
+                res.status(422).jsonp(resp);
                 console.log("Wrong password");
             }
         } else{
@@ -29,12 +29,16 @@ module.exports.login = function(req, res){
                 password: req.body.password
             });
             
-            newUser.save(function(err){                
-                if(err) return console.log(err);
-                var resp = {status: 2};
-                res.jsonp(resp);
-                console.log(`${newUser.name} was created`);
-            });    
+            userModel.create(newUser, function (err, doc) {
+                let user = {name:doc.name};
+                tokenModel.findOneAndUpdate({"user_id": doc._id}, {$setOnInsert: {"token":new Date().valueOf()}}, {new: true, upsert: true},
+                function(err,doc){
+                    console.log(`New token wad added ${doc.token}`);
+                    user.token = doc.token;
+                    res.type('application/json');
+                    res.jsonp(user);
+                }); 
+            }); 
         }
     });
 }
@@ -50,8 +54,7 @@ module.exports.getUser = function(req, res){
                 res.jsonp(doc);
             }); 
         } else  {
-            var resp = {"status":401, "field":"Unauthorized","message":"You should log in again"};
-            res.jsonp(resp);
+            res.status(401).send("");
         }
     });
 }
@@ -59,7 +62,30 @@ module.exports.getUser = function(req, res){
 
 //EDIT CURRENT USER
 module.exports.editUser = function(req, res){ 
-
+    function checkParams(obj) {
+        let result = {status: true, msg: []};
+        if (obj.name.length < 3) {
+            result.status = false;
+            result.msg.push({field: "name", message:"Name error"});
+        }
+        if (obj.email.length < 3) {
+            result.status = false;
+            result.msg.push({field: "email", message:"Email error"});
+        }
+        if (obj.phone.length < 3) {
+            result.status = false;
+            result.msg.push({field: "phone", message:"Phone error"});
+        }
+        return result;
+    }
+    console.log(req);
+    let chk = checkParams(req.body);
+    console.log(chk);
+    if (!chk.status) {
+        res.status(422).jsonp(chk.msg);
+        return;
+    }
+    
     tokenModel.findOne({"token":req.headers.authorization}, function(err, doc){
         if(doc){
             userModel.findOneAndUpdate({"_id":doc.user_id},
@@ -73,8 +99,7 @@ module.exports.editUser = function(req, res){
                     res.jsonp(doc);
                 }); 
         } else  {
-            var resp = {"status":401, "field":"Unauthorized","message":"You should log in again"};
-            res.jsonp(resp);
+            res.status(401).send("");
         }
     });
 }

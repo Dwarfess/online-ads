@@ -9,9 +9,10 @@
     <script src="libraries/angular.js"></script>
     <script src="libraries/angular-route.min.js"></script>	
 	<script src="app.js"></script>
+	<script src="services/transport.js"></script>
 	<script src="controllers/mainCtrl.js"></script>
 	<script src="controllers/itemCtrl.js"></script>
-	<script src="services/transport.js"></script>
+	
 </head>
 
 <body ng-controller="mainCtrl">
@@ -24,10 +25,11 @@
             
             <form class = "search" ng-controller = "itemCtrl">
                 <input type="text" ng-model = "search.title" placeholder="search">
+                <input type="text" ng-model = "search.user_id" placeholder="user_id">
                 <select name="" ng-model = "search.order_by" ng-options="order_by for order_by in ['created_at','price']">         
                 </select> 
 
-                <select name="" ng-model = "search.order_type" ng-options="order_type for order_type in ['desc','esc']">         
+                <select name="" ng-model = "search.order_type" ng-options="order_type for order_type in ['desc','asc']">         
                 </select>
                 <button ng-click = "searchItems(search)">
                     <i class="fa fa-search" aria-hidden="true"></i>

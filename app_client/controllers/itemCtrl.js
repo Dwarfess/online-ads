@@ -1,6 +1,6 @@
 app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, transport){
 
-    $scope.json = [{title:"Drill",
+    $rootScope.json = [{title:"Drill",
                     price:"5.00",
                     image:"",
                     created_at: "2018-03-15T15:38:21.523+0000",
@@ -32,15 +32,14 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
                   }];
     
     //SEARCH ITEMS
-    $scope.search = {title:"", order_by:"created_at", order_type:"desc"};
+    $scope.search = {title:"", user_id:"", order_by:"created_at", order_type:"desc"};
     $scope.searchItems = function(search){
 
         console.log(search);
         
-        $http.get(`/api/item?title=${search.title}&user_id=1&order_by=${search.order_by}&order_type=${search.order_type}`).then(function (response) {
+        $http.get(`/api/item?title=${search.title}&user_id=${search.user_id}&order_by=${search.order_by}&order_type=${search.order_type}`).then(function (response) {
             console.log('success', response.data);// success
-            $scope.json = response.data;
-            console.log($scope.json);
+            $rootScope.json = response.data;
             $location.path('/table');
 
         }, function (data, status, headers, config) {
@@ -89,7 +88,7 @@ app.controller("itemCtrl", function ($scope, $rootScope, $http, $location, trans
     
     //edit or create new task
     $scope.editOrCreate = function (item, view, currentView, showGroup) {
-        $scope.token = transport.getToken();
+        //$scope.token = transport.getToken();
         console.log($scope.token);
         if($scope.token){
             $rootScope.currentItem = item ? angular.copy(item) : {};

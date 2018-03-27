@@ -7,33 +7,33 @@ var userModel = mongoose.model('user');
 var tokenModel = mongoose.model('token');
 var itemModel = mongoose.model('item');
 
-//function receives and adds the array with tasks to mongo
-async function list(file){
-    var obj = file; 
-    console.log("Start list");
-    for(var i=0;i<obj.length;i++){
-        let newTask = new tasksModel(obj[i]);
-
-        await (newTask.save(function(err){
-            if(err) return console.log(err);
-        }));
-    }
-}
-
-    //GET ALL TASKS
+    //GET ALL ITEMS
 module.exports.searchItems = function(req, res){ 
     let parse_url = url.parse(req.url).query;
     let title = qs.parse(parse_url).title;
     let user_id = qs.parse(parse_url).user_id;
     let order_by = qs.parse(parse_url).order_by;
     let order_type = qs.parse(parse_url).order_type;
+    let order = -1;
+    if (order_type == "asc") order = 1;
     console.log(`/${title}/${user_id}/${order_by}/${order_type}`);
-    itemModel.find({}, function(err, doc){
-        console.log(`***************`);
-        console.log(doc);
+    let find = title ? {"title":title} : {};
+    if (user_id != "") {
+        find.user_id = user_id;
+    }
+    
+    
+    let sortObj = null;
+    switch (order_by) {
+        case "created_at": sortObj = {created_at: order};break;
+        case "price": sortObj = {price: order};break;
+    }
+    console.log(sortObj);
+    itemModel.find(find, null/*["created_at", "title", "price", "user_id", "user"]*/,{sort: sortObj}, function(err, doc){
         res.type('application/json');
         res.jsonp(doc);
-    });      
+    });  
+    
 };
 
     //SAVE MOVING TASKS
@@ -100,7 +100,7 @@ module.exports.createItem = function(req, res){
                     if (err) return handleError(err);
                     res.type('application/json');
                     res.jsonp(doc);
-                })
+                });
             }); 
         } else  {
             var resp = {"status":401, "field":"Unauthorized","message":"You should log in  again"};

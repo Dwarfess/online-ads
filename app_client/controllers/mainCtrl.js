@@ -41,10 +41,6 @@ app.controller("mainCtrl", function ($scope, $http, transport){
                 
                 $scope.showForms(false,false,false,false);
                 
-            } if (response.data.status == 422) {
-                $scope.createdUser = false;
-                $scope.wrongPass = response.data.message;
-                
             } if (response.data.status == 2) {   
                 $scope.createdUser = true;
                 $scope.wrongPass = false;
@@ -52,6 +48,11 @@ app.controller("mainCtrl", function ($scope, $http, transport){
             }
             
         }, function (data, status, headers, config) {
+            if (data.status == 422) {
+                $scope.createdUser = false;
+                $scope.wrongPass = data.data.message;
+                
+            }
             console.log(data);
             console.log(status);
             console.log(headers);
@@ -67,12 +68,12 @@ app.controller("mainCtrl", function ($scope, $http, transport){
             console.log('success', response.data);// success
             if (response.data.name) {
                 $scope.currentUser = response.data;
-                $scope.showForms(true, false, true);
-                
-            } else if(response.data.status == 401) {
-                console.log(response.data.message);
+                $scope.showForms(true, false, true);       
             }
         }, function (data, status, headers, config) {
+            if(data.status == 401) {
+                console.log("You should log in again");
+            }
             console.log(data);
             console.log(status);
             console.log(headers);
@@ -88,11 +89,15 @@ app.controller("mainCtrl", function ($scope, $http, transport){
                 $scope.online.login = response.data.name;//add user name
                 $scope.currentUser = response.data;
                 $scope.showForms(false,false,false,false);
-                
-            } else if(response.data.status == 401) {
-                console.log(response.data.message);
             }
         }, function (data, status, headers, config) {
+            if(data.status == 401) {
+                console.log("You should log in again");
+            }
+            if(data.status == 422) {
+                console.log(data.data);
+            }
+            
             console.log(data);
             console.log(status);
             console.log(headers);
